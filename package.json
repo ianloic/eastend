@@ -1,0 +1,23 @@
+{
+  "name": "eastend",
+  "version": "0.1.0",
+  "description": "A module / script loader for modern browsers.",
+  "main": "src/eastend.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "amd",
+    "promises"
+  ],
+  "author": "Ian McKellar <ian@mckellar.org>",
+  "license": "MIT",
+  "devDependencies": {
+    "google-closure-compiler": "^20160208.4.0",
+    "grunt": "~0.4.5",
+    "grunt-eslint": "^18.0.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^2.0.0",
+    "load-grunt-tasks": "^3.4.1"
+  }
+}

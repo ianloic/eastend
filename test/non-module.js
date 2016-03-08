@@ -1,0 +1,1 @@
+window.NonModule = 'non-module';
