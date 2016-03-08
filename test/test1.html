@@ -3,8 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
+
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            var roots = document.getElementsByTagName('body') || document.getElementsByTagName('html');
+            var root = roots[0];
+            var pre = document.createElement('pre');
+            pre.setAttribute('style', 'background:red;color:white');
+            root.appendChild(pre);
+            pre.appendChild(document.createTextNode(message + '\n' + source + ':' + lineno + ':' + colno + '\n'+error));
+        }
+    </script>
+
+    <script src="https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js"></script>
     <script src="../src/eastend.js"></script>
     <!--<script src="../dest/eastend.min.js"></script>-->
+
+    <style>
+        .results > div {
+            margin-bottom: 5px;
+        }
+        .success {
+            background-color: rgba(0,255,0,0.5);
+        }
+        .failure {
+            background-color: rgba(255,0,0,0.5);
+        }
+    </style>
 
     <script>
         /**
@@ -14,23 +39,33 @@
          */
         function test(name, promise) {
             var div = document.createElement('div');
-            div.textContent = name + ": ";
-            var span = document.createElement('span');
-            span.textContent = '...';
-            div.appendChild(span);
-            document.body.appendChild(div);
-            div.className = 'running';
+            div.className = 'test';
+
+            var title = document.createElement('div');
+            title.className = 'title';
+            title.textContent = name;
+            div.appendChild(title);
+
+            var status = document.createElement('div');
+            status.className = 'status';
+            div.appendChild(status);
+
+            document.getElementById('results').appendChild(div);
+
             promise.then(function() {
-                span.textContent = 'OK';
                 div.className = 'success';
+                status.textContent = 'OK';
             }).catch(function(error) {
-                span.textContent = error || 'Failed';
                 div.className = 'failure';
-            })
+                status.textContent = error || 'Failed';
+            });
         }
     </script>
 </head>
+
 <body>
+
+<div id="results"></div>
 
 <script>
     test('Simple module require', require('a.js').then(function (a) {
