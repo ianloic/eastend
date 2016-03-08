@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
-    <!--<script src="../src/eastend.js"></script>-->
-    <script src="../dest/eastend.min.js"></script>
+    <script src="../src/eastend.js"></script>
+    <!--<script src="../dest/eastend.min.js"></script>-->
 
     <script>
         /**
@@ -52,6 +52,18 @@
     }));
 
     test('Dependency not found', require('dep-not-found.js').then(function (b) {
+        return Promise.reject('Expected error');
+    }).catch(function () {
+        return Promise.resolve();
+    }));
+
+    test('Invalid module', require('invalid-module.js').then(function (b) {
+        return Promise.reject('Expected error');
+    }).catch(function () {
+        return Promise.resolve();
+    }));
+
+    test('Invalid depedency', require('invalid-dep.js').then(function (b) {
         return Promise.reject('Expected error');
     }).catch(function () {
         return Promise.resolve();
