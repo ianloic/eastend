@@ -8,8 +8,15 @@
 // TODO:
 // - investigate dropping dependency on URL & document.head.
 
-(function (window) {
+(function (self) {
+    // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};
+
+    // Outstanding promise callbacks to be delivered for a particular module.
+    var callbacks = {};
+
+    // Modules, by URL.
+    var modules = {};
 
     var defined = null;
 
@@ -17,34 +24,30 @@
         return (new URL(url, base)).toString();
     }
 
-    function getScriptElement(url) {
-        return document.querySelector('script[src="' + url + '"]');
-    }
-
     /**
      * Complete the loading of a script. Call the appropriate callbacks.
      *
-     * @param {HTMLScriptElement} script - the script element that is complete.
+     * @param {string} url - the URL of the module.
      * @param {number} callback - 0 for the resolve callbacks, 1 for the reject callbacks.
      * @param {Object=} argument - the callback argument.
      * @returns {void}
      */
-    function complete(script, callback, argument) {
-        if (!script.loading) {
+    function complete(url, callback, argument) {
+        if (!callbacks[url]) {
             return;
         }
-        for (var i=0; i<script.loading.length; i++) {
-            script.loading[i][callback](argument);
+        for (var i=0; i<callbacks[url].length; i++) {
+            callbacks[url][i][callback](argument);
         }
-        delete script.loading;
+        delete callbacks[url];
     }
 
-    function resolveScript(script) {
-        return complete(script, 0, script.module);
+    function resolveScript(url) {
+        return complete(url, 0, modules[url]);
     }
 
-    function rejectScript(script) {
-        return complete(script, 1);
+    function rejectScript(url) {
+        return complete(url, 1);
     }
 
     /**
@@ -55,42 +58,38 @@
      * @returns {Promise} - a promise that will resolve or reject when the script has loaded or failed to load.
      */
     function requireUrl(url, global) {
-        var script = getScriptElement(url);
-        if (!script) {
+        if (!callbacks[url]) {
+            callbacks[url] = [];
             return new Promise(function (resolve, reject) {
-                script = document.createElement('script');
+                var script = document.createElement('script');
                 script.src = url;
-                script.loading = [[resolve, reject]];
+                callbacks[url].push([resolve, reject]);
                 script.onload = function () {
                     if (defined) {
-                        defineScript(script, defined[0], defined[1]);
+                        defineScript(url, defined[0], defined[1]);
                         defined = null;
                     } else {
                         if (global) {
-                            script.module = window[global];
+                            modules[url] = self[global];
                         } else {
-                            script.module = true;
+                            modules[url] = true;
                         }
-                        resolveScript(script);
+                        resolveScript(url);
                     }
                 };
                 script.onerror = function () {
-                    rejectScript(script);
+                    rejectScript(url);
                 };
                 document.head.appendChild(script);
             });
         }
-        if (script.module) {
+        if (modules[url]) {
             // Module already loaded - resolve immediately.
-            return Promise.resolve(script.module);
+            return Promise.resolve(modules[url]);
         }
-        if (script.loading) {
-            return new Promise(function (resolve, reject) {
-                script.loading.push([resolve, reject]);
-            });
-        }
-        // This shouldn't happen.
-        return Promise.reject();
+        return new Promise(function (resolve, reject) {
+            callbacks[url].push([resolve, reject]);
+        });
     }
 
     /**
@@ -123,39 +122,37 @@
         return false;
     }
 
-    function defineScript(script, deps, factory) {
-        var moduleUrl = script.src;
-
-        var moduleDeps = depGraph[moduleUrl] || {};
+    function defineScript(url, deps, factory) {
+        var moduleDeps = depGraph[url] || {};
 
         var dependencyPromises = [];
         for (var i=0; i<deps.length; i++) {
-            var depUrl = relative(deps[i], moduleUrl);
+            var depUrl = relative(deps[i], url);
             moduleDeps[depUrl] = 1;
             dependencyPromises.push(requireUrl(depUrl));
         }
-        depGraph[moduleUrl] = moduleDeps;
-        if (findCycles(moduleUrl)) {
-            rejectScript(script);
+        depGraph[url] = moduleDeps;
+        if (findCycles(url)) {
+            rejectScript(url);
             return;
         }
         Promise.all(dependencyPromises).then(function (loadedDeps) {
-            script.module = factory.apply(window, loadedDeps);
-            resolveScript(script);
+            modules[url] = factory.apply(self, loadedDeps);
+            resolveScript(url);
         }).catch(function () {
-            rejectScript(script);
+            rejectScript(url);
         });
     }
 
     function require(moduleName, global) {
-        var base = require['base'] || window.location.href;
+        var base = require['base'] || self.location.href;
         var url = relative(moduleName, base);
         return requireUrl(url, global);
     }
-    window['require'] = require;
+    self['require'] = require;
 
     function define(deps, factory) {
         defined = [deps, factory];
     }
-    window['define'] = define;
-}(window));
+    self['define'] = define;
+}(self));
