@@ -29,7 +29,6 @@ function test(name, factory) {
     tests[name] = factory;
     total++;
     updateProgress();
-
 }
 
 function runTest(name) {

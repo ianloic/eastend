@@ -1,6 +1,5 @@
 function load(urls, callback) {
     for (var i=0; i<urls.length; i++) {
-        console.log(urls[i]);
         importScripts(urls[i]);
     }
     callback();
