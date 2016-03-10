@@ -9,6 +9,10 @@
 // - investigate dropping dependency on URL & document.head.
 
 (function (self) {
+    var document = self.document;
+    var importScripts = self.importScripts;
+
+
     // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};
 
@@ -52,9 +56,9 @@
 
     function load(url) {
         return new Promise(function(resolve, reject) {
-            if (self.importScripts) {
+            if (importScripts) {
                 try {
-                    self.importScripts(url);
+                    importScripts(url);
                     resolve();
                 } catch (ex) {
                     reject();

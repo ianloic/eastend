@@ -10,6 +10,7 @@
         }
     </style>
     <script src="testConfig.js"></script>
+    <script src="runner.js"></script>
 </head>
 <body>
 <table>
@@ -38,8 +39,8 @@
     var tbody = document.getElementById('tbody');
 
     for (var configName in testConfig) {
+        if (!testConfig.hasOwnProperty(configName)) continue;
         console.log('cn', configName);
-        document.write('<iframe src="tests/index.html#'+configName+'"></iframe>');
         var tr = document.createElement('tr');
         var td = document.createElement('td');
         tr.appendChild(td);
@@ -48,7 +49,12 @@
         td.id = configName;
         tr.appendChild(td);
         tbody.appendChild(tr);
+        td = document.createElement('td');
+        tr.appendChild(td);
+        td.appendChild(iframeTest(configName, 'tests.js'));
     }
+
+    document.createElement('iframe');
 </script>
 </body>
 </html>
