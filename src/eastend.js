@@ -50,6 +50,25 @@
         return complete(url, 1);
     }
 
+    function load(url) {
+        return new Promise(function(resolve, reject) {
+            if (self.importScripts) {
+                try {
+                    self.importScripts(url);
+                    resolve();
+                } catch (ex) {
+                    reject();
+                }
+            } else {
+                var script = document.createElement('script');
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            }
+        });
+    }
+
     /**
      * Load a module or script.
      *
@@ -61,10 +80,8 @@
         if (!callbacks[url]) {
             callbacks[url] = [];
             return new Promise(function (resolve, reject) {
-                var script = document.createElement('script');
-                script.src = url;
                 callbacks[url].push([resolve, reject]);
-                script.onload = function () {
+                load(url).then(function() {
                     if (defined) {
                         defineScript(url, defined[0], defined[1]);
                         defined = null;
@@ -76,11 +93,9 @@
                         }
                         resolveScript(url);
                     }
-                };
-                script.onerror = function () {
+                }).catch(function() {
                     rejectScript(url);
-                };
-                document.head.appendChild(script);
+                });
             });
         }
         if (modules[url]) {
