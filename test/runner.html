@@ -40,21 +40,11 @@
 
     for (var configName in testConfig) {
         if (!testConfig.hasOwnProperty(configName)) continue;
-        console.log('cn', configName);
-        var tr = document.createElement('tr');
-        var td = document.createElement('td');
-        tr.appendChild(td);
-        td.textContent = configName;
-        td = document.createElement('td');
-        td.id = configName;
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        td = document.createElement('td');
-        tr.appendChild(td);
-        td.appendChild(iframeTest(configName, 'tests.js'));
+        runTests('frame-' + configName, configName, frameTest);
+        runTests('worker-' + configName, configName, workerTest);
+
     }
 
-    workerTest('native-source', 'tests.js');
 </script>
 </body>
 </html>
