@@ -12,3 +12,11 @@ function iframeTest(config, script) {
     return iframe;
 }
 
+function workerTest(config, script) {
+    var worker = new Worker('workerrunner.js');
+    console.log(config);
+    worker.addEventListener('message', function(event) {
+        console.log(event.data);
+    });
+    worker.postMessage([config, script]);
+}
