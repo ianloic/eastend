@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+
+    <script>
+        var report = {
+            start: function(config) { },
+            progress: function(config, succeeded, failed, total) {
+
+            },
+            complete: function(config) { },
+            error: function(config, message) {}
+        };
+
+        if (window.parent && window.parent.report) {
+            report = window.parent.report;
+        }
+
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            var roots = document.getElementsByTagName('body') || document.getElementsByTagName('html');
+            var root = roots[0];
+            var pre = document.createElement('pre');
+            pre.setAttribute('style', 'background:red;color:white');
+            root.appendChild(pre);
+            pre.appendChild(document.createTextNode(message + '\n' + source + ':' + lineno + ':' + colno + '\n'+error));
+        };
+    </script>
+
+    <script src="../testConfig.js"></script>
+    <script>
+        var config = window.location.hash.substr(1);
+        testConfig[config](window);
+    </script>
+
+    <style>
+        .results > div {
+            margin-bottom: 5px;
+        }
+        .success {
+            background-color: rgba(0,255,0,0.5);
+        }
+        .failure {
+            background-color: rgba(255,0,0,0.5);
+        }
+    </style>
+
+    <script>
+        var total = 0;
+        var succeeded = 0;
+        var failed = 0;
+
+        function updateProgress() {
+            report.progress(config, succeeded, failed, total);
+        }
+
+        /**
+         * Run a test encapsulated in a Promise.
+         * @param {String} name - the name of the test
+         * @param {Promise} promise - the promise that will run the test.
+         */
+        function test(name, promise) {
+            total++;
+            updateProgress();
+            var div = document.createElement('div');
+            div.className = 'test';
+
+            var title = document.createElement('div');
+            title.className = 'title';
+            title.textContent = name;
+            div.appendChild(title);
+
+            var status = document.createElement('div');
+            status.className = 'status';
+            div.appendChild(status);
+
+            document.getElementById('results').appendChild(div);
+
+            promise.then(function() {
+                div.className = 'success';
+                status.textContent = 'OK';
+                succeeded++;
+                updateProgress();
+            }).catch(function(error) {
+                div.className = 'failure';
+                status.textContent = error || 'Failed';
+                failed++;
+                updateProgress();
+            });
+        }
+    </script>
+</head>
+
+<body>
+
+<div id="results"></div>
+
+<script src="index.js"></script>
+
+
+</body>
+</html>

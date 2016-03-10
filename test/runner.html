@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Runner</title>
+    <style>
+        iframe {
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+    <script src="testConfig.js"></script>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>config</th>
+        <th>progress</th>
+    </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+</table>
+<script>
+    var report = {
+        start: function(config) {
+        },
+        progress: function(config, succeeded, failed, total) {
+            var e = document.getElementById(config);
+            e.textContent = '' + succeeded + ' / ' + failed + ' / ' + total;
+        },
+        complete: function(config) {
+        },
+        error: function(config, message) {
+        }
+    };
+
+    var tbody = document.getElementById('tbody');
+
+    for (var configName in testConfig) {
+        console.log('cn', configName);
+        document.write('<iframe src="tests/index.html#'+configName+'"></iframe>');
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        tr.appendChild(td);
+        td.textContent = configName;
+        td = document.createElement('td');
+        td.id = configName;
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+    }
+</script>
+</body>
+</html>
