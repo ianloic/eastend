@@ -39,9 +39,9 @@
         if (!callbacks[url]) {
             return;
         }
-        for (var i = 0; i < callbacks[url].length; i++) {
-            callbacks[url][i][callback](argument);
-        }
+        callbacks[url].forEach(function(cbs) {
+            cbs[callback](argument);
+        });
         delete callbacks[url];
     }
 
@@ -128,15 +128,21 @@
         return false;
     }
 
+    /**
+     * Instantiate a module, given its url, dependencies and factory function.
+     * @param {string} url - URL of the module
+     * @param {Array} deps - dependency names of the module
+     * @param {Function} factory - function that returns the module
+     * @return {void}
+     */
     function defineScript(url, deps, factory) {
         var moduleDeps = depGraph[url] || {};
 
-        var dependencyPromises = [];
-        for (var i = 0; i < deps.length; i++) {
-            var depUrl = relative(deps[i], url);
+        var dependencyPromises = deps.map(function(dep) {
+            var depUrl = relative(dep, url);
             moduleDeps[depUrl] = 1;
-            dependencyPromises.push(requireUrl(depUrl));
-        }
+            return requireUrl(depUrl);
+        });
         depGraph[url] = moduleDeps;
         if (findCycles(url)) {
             rejectScript(url);
