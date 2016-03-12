@@ -1,5 +1,8 @@
 // Code shared between frame and worker test hosts.
 
+/* globals load, sendMessage */
+/* exported test */
+
 var report = {
     start: function(id) {
         sendMessage(['start', id]);
@@ -22,7 +25,7 @@ var succeeded = 0;
 var failed = 0;
 
 function updateProgress() {
-    report.progress(id, succeeded, failed, total);
+    report.progress(self.id, succeeded, failed, total);
 }
 
 function test(name, factory) {
@@ -35,11 +38,11 @@ function runTest(name) {
     var promise = tests[name]();
     promise.then(function() {
         succeeded++;
-        console.log('SUCCESS', id, name);
+        console.log('SUCCESS', self.id, name);
         updateProgress();
     }).catch(function(error) {
         failed++;
-        console.log('FAIL', id, name, error);
+        console.log('FAIL', self.id, name, error);
         updateProgress();
     });
 }
@@ -50,7 +53,9 @@ self.onmessage = function onmessage(event) {
 
     load(event.data[1], function() {
         for (var name in tests) {
-            if (!tests.hasOwnProperty(name)) continue;
+            if (!tests.hasOwnProperty(name)) {
+                continue;
+            }
             runTest(name);
         }
     });

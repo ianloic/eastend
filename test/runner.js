@@ -1,3 +1,55 @@
+// test configurations
+
+var testConfig = [];
+
+var booleans = [false, true];
+
+booleans.forEach(function(compiled) {
+    booleans.forEach(function(polyfill) {
+        booleans.forEach(function(worker) {
+            var id = (worker ? 'worker' : 'frame') + '-' +
+                (polyfill ? 'polyfill' : 'native') + '-' +
+                (compiled ? 'compiled' : 'source');
+            var urls = [];
+            if (polyfill) {
+                urls.push('https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js');
+            }
+            urls.push('../../' + (compiled?'dist':'src') +
+                '/eastend' + (worker?'-worker':'') +
+                (compiled?'.min':'') + '.js');
+            urls.push('tests.js');
+            testConfig.push({
+                id: id,
+                urls: urls,
+                worker: worker
+            });
+        });
+    });
+});
+
+
+var report = {
+    start: function(config) {
+        console.log('start', config);
+    },
+    progress: function(config, succeeded, failed, total) {
+        var e = document.getElementById(config);
+        e.textContent = '' + succeeded + ' / ' + failed + ' / ' + total;
+    },
+    complete: function(config) {
+        console.log('complete', config);
+    },
+    error: function(config, message) {
+        console.error(config, message);
+    }
+};
+
+var tbody = document.getElementById('tbody');
+
+testConfig.forEach(function(config) {
+    runTests(config);
+});
+
 function runTests(config) {
     var tr = document.createElement('tr');
     var td = document.createElement('td');
@@ -31,7 +83,7 @@ function frameTest(id, urls) {
     return iframe;
 }
 window.onmessage = function(event) {
-    if (event.origin != document.origin) {
+    if (event.origin !== document.origin) {
         console.error('postMessage orgin mismatch', event.origin, document.origin);
         return;
     }
@@ -48,3 +100,4 @@ function workerTest(id, urls) {
     };
     worker.postMessage([id, urls]);
 }
+

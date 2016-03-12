@@ -9,8 +9,6 @@
             height: 10px;
         }
     </style>
-    <script src="testConfig.js"></script>
-    <script src="runner.js"></script>
 </head>
 <body>
 <table>
@@ -22,27 +20,6 @@
     </thead>
     <tbody id="tbody"></tbody>
 </table>
-<script>
-    var report = {
-        start: function(config) {
-        },
-        progress: function(config, succeeded, failed, total) {
-            var e = document.getElementById(config);
-            e.textContent = '' + succeeded + ' / ' + failed + ' / ' + total;
-        },
-        complete: function(config) {
-        },
-        error: function(config, message) {
-        }
-    };
-
-    var tbody = document.getElementById('tbody');
-
-    for (var id in testConfig) {
-        if (!testConfig.hasOwnProperty(id)) continue;
-        runTests(testConfig[id]);
-    }
-
-</script>
+<script src="runner.js"></script>
 </body>
 </html>

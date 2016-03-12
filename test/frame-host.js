@@ -1,4 +1,4 @@
-
+/* exported load, sendMessage */
 
 window.onerror = function(message, source, lineno, colno, error) {
     var roots = document.getElementsByTagName('body') || document.getElementsByTagName('html');
@@ -22,14 +22,14 @@ function importScript(url, callback) {
 }
 
 function load(urls, callback) {
-    if (urls.length == 0) {
+    if (urls.length === 0) {
         // All loaded.
         callback();
     } else {
         var url = urls.pop();
         importScript(url, function() {
             load(urls, callback);
-        })
+        });
     }
 }
 
