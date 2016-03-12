@@ -8,8 +8,8 @@
 // TODO:
 // - investigate dropping dependency on URL & document.head.
 
-(function (self) {
-    var document = self.document;
+(function (window) {
+    var document = window.document;
 
     // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};
@@ -20,6 +20,7 @@
     // Modules, by URL.
     var modules = {};
 
+    // The last thing that was define()d.
     var defined;
 
     function relative(url, base) {
@@ -83,7 +84,7 @@
                     defined = null;
                 } else {
                     if (global) {
-                        modules[url] = self[global];
+                        modules[url] = window[global];
                     } else {
                         modules[url] = true;
                     }
@@ -142,7 +143,7 @@
             return;
         }
         Promise.all(dependencyPromises).then(function (loadedDeps) {
-            modules[url] = factory.apply(self, loadedDeps);
+            modules[url] = factory.apply(window, loadedDeps);
             resolveScript(url);
         }).catch(function () {
             rejectScript(url);
@@ -150,16 +151,16 @@
     }
 
     function require(moduleName, global) {
-        var base = require['base'] || self.location.href;
+        var base = require['base'] || window.location.href;
         var url = relative(moduleName, base);
         return requireUrl(url, global);
     }
 
-    self['require'] = require;
+    window['require'] = require;
 
     function define(deps, factory) {
         defined = [deps, factory];
     }
 
-    self['define'] = define;
-}(self));
+    window['define'] = define;
+}(window));
