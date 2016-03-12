@@ -1,5 +1,4 @@
 function runTests(config) {
-    console.log('runTests', config);
     var tr = document.createElement('tr');
     var td = document.createElement('td');
     tr.appendChild(td);
@@ -26,7 +25,7 @@ function frameTest(id, urls) {
         iframe.contentWindow.postMessage([id, urls], document.origin);
     };
     iframe.onerror = function(event) {
-        console.log('frame error for', id, event);
+        console.error('frame error for', id, event);
     };
     document.body.appendChild(iframe);
     return iframe;
@@ -40,13 +39,12 @@ window.onmessage = function(event) {
 };
 
 function workerTest(id, urls) {
-    console.log('workerTest', id, urls);
     var worker = new Worker('worker-host.js');
     worker.onmessage = function(event) {
         handleMessage(event.data);
     };
     worker.onerror = function(event) {
-        console.log('worker error', event);
+        console.error('worker error', event);
     };
     worker.postMessage([id, urls]);
 }

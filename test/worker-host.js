@@ -1,5 +1,3 @@
-console.log('worker-host');
-
 function load(urls, callback) {
     for (var i=0; i<urls.length; i++) {
         importScripts(urls[i]);

@@ -1,7 +1,5 @@
 /* global importScripts */
 
-console.log('eastend-worker');
-
 (function (self) {
     var defined;
     var modules = {};
@@ -57,7 +55,6 @@ console.log('eastend-worker');
             try {
                 defined = null;
                 importScripts(url);
-                console.log('defined', defined);
 
                 if (defined) {
                     var factory = defined[1];
@@ -69,12 +66,11 @@ console.log('eastend-worker');
                         var depUrl = relative(deps[i], url);
                         moduleDeps[depUrl] = 1;
                         if (findCycles(url)) {
-                            console.error('circular dependency', url);
+                            // Circular dependency.
                             return null;
                         }
                         var dep = requireSync(depUrl);
                         if (!dep) {
-                            console.error('Failed to load dep', dep);
                             return null;
                         }
                         loadedDeps.push(dep);
@@ -86,14 +82,13 @@ console.log('eastend-worker');
                     modules[url] = true;
                 }
             } catch(error) {
-                console.error(error);
+                return null;
             }
         }
         return modules[url];
     }
 
     function require(moduleName, global) {
-        console.log('worker:require', moduleName, global);
         var module = requireSync(moduleName, global);
         return module?Promise.resolve(module):Promise.reject(module);
     }
@@ -101,7 +96,6 @@ console.log('eastend-worker');
     self['require'] = require;
 
     function define(deps, factory) {
-        console.log('worker:define', deps, factory);
         defined = [deps, factory];
     }
 

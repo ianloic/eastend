@@ -14,7 +14,6 @@ function config(compiled, polyfill, worker) {
     if (polyfill) {
         urls.push(POLYFILL);
     }
-    console.log('compiled', compiled, (compiled ? 'compiled' : 'source'));
     urls.push(library(compiled, worker));
     urls.push('tests.js');
     return {
@@ -29,12 +28,8 @@ var testConfig = {};
 for (compiled in [0, 1]) {
     for (polyfill in [0, 1]) {
         for (worker in [0, 1]) {
-            console.log('config', compiled, polyfill, worker);
             var c = config(compiled>0, polyfill>0, worker>0);
-            console.log(c.id);
             testConfig[c.id] = c;
         }
     }
 }
-
-console.log(testConfig);
