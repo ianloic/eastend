@@ -10,8 +10,6 @@
 
 (function (self) {
     var document = self.document;
-    var importScripts = self.importScripts;
-
 
     // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};
@@ -22,7 +20,7 @@
     // Modules, by URL.
     var modules = {};
 
-    var defined = null;
+    var defined;
 
     function relative(url, base) {
         return (new URL(url, base)).toString();
@@ -40,7 +38,7 @@
         if (!callbacks[url]) {
             return;
         }
-        for (var i=0; i<callbacks[url].length; i++) {
+        for (var i = 0; i < callbacks[url].length; i++) {
             callbacks[url][i][callback](argument);
         }
         delete callbacks[url];
@@ -54,25 +52,6 @@
         return complete(url, 1);
     }
 
-    function load(url) {
-        return new Promise(function(resolve, reject) {
-            if (importScripts) {
-                try {
-                    importScripts(url);
-                    resolve();
-                } catch (ex) {
-                    reject();
-                }
-            } else {
-                var script = document.createElement('script');
-                script.src = url;
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            }
-        });
-    }
-
     /**
      * Load a module or script.
      *
@@ -81,33 +60,40 @@
      * @returns {Promise} - a promise that will resolve or reject when the script has loaded or failed to load.
      */
     function requireUrl(url, global) {
-        if (!callbacks[url]) {
-            callbacks[url] = [];
-            return new Promise(function (resolve, reject) {
-                callbacks[url].push([resolve, reject]);
-                load(url).then(function() {
-                    if (defined) {
-                        defineScript(url, defined[0], defined[1]);
-                        defined = null;
-                    } else {
-                        if (global) {
-                            modules[url] = self[global];
-                        } else {
-                            modules[url] = true;
-                        }
-                        resolveScript(url);
-                    }
-                }).catch(function() {
-                    rejectScript(url);
-                });
-            });
-        }
         if (modules[url]) {
             // Module already loaded - resolve immediately.
             return Promise.resolve(modules[url]);
         }
+        if (callbacks[url]) {
+            // Module is already being loaded, return a promise that will complete when the in-progress load completes.
+            return new Promise(function (resolve, reject) {
+                callbacks[url].push([resolve, reject]);
+            });
+        }
+
+        callbacks[url] = [];
+
         return new Promise(function (resolve, reject) {
             callbacks[url].push([resolve, reject]);
+            var script = document.createElement('script');
+            script.src = url;
+            script.onload = function () {
+                if (defined) {
+                    defineScript(url, defined[0], defined[1]);
+                    defined = null;
+                } else {
+                    if (global) {
+                        modules[url] = self[global];
+                    } else {
+                        modules[url] = true;
+                    }
+                    resolveScript(url);
+                }
+            };
+            script.onerror = function () {
+                rejectScript(url);
+            };
+            document.head.appendChild(script);
         });
     }
 
@@ -145,7 +131,7 @@
         var moduleDeps = depGraph[url] || {};
 
         var dependencyPromises = [];
-        for (var i=0; i<deps.length; i++) {
+        for (var i = 0; i < deps.length; i++) {
             var depUrl = relative(deps[i], url);
             moduleDeps[depUrl] = 1;
             dependencyPromises.push(requireUrl(depUrl));
@@ -168,10 +154,12 @@
         var url = relative(moduleName, base);
         return requireUrl(url, global);
     }
+
     self['require'] = require;
 
     function define(deps, factory) {
         defined = [deps, factory];
     }
+
     self['define'] = define;
 }(self));

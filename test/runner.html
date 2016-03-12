@@ -38,10 +38,9 @@
 
     var tbody = document.getElementById('tbody');
 
-    for (var configName in testConfig) {
-        if (!testConfig.hasOwnProperty(configName)) continue;
-        runTests('frame-' + configName, configName, frameTest);
-        runTests('worker-' + configName, configName, workerTest);
+    for (var id in testConfig) {
+        if (!testConfig.hasOwnProperty(id)) continue;
+        runTests(testConfig[id]);
     }
 
 </script>

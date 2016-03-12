@@ -1,19 +1,17 @@
-function runTests(id, configName, host) {
+function runTests(config) {
+    console.log('runTests', config);
     var tr = document.createElement('tr');
     var td = document.createElement('td');
     tr.appendChild(td);
-    td.textContent = id;
+    td.textContent = config.id;
     td = document.createElement('td');
-    td.id = id;
+    td.id = config.id;
     tr.appendChild(td);
     tbody.appendChild(tr);
     td = document.createElement('td');
     tr.appendChild(td);
 
-    var urls = testConfig[configName].slice();
-    urls.push('tests.js');
-
-    host(id, urls);
+    (config.worker?workerTest:frameTest)(config.id, config.urls);
 }
 
 function handleMessage(data) {
@@ -42,6 +40,7 @@ window.onmessage = function(event) {
 };
 
 function workerTest(id, urls) {
+    console.log('workerTest', id, urls);
     var worker = new Worker('worker-host.js');
     worker.onmessage = function(event) {
         handleMessage(event.data);

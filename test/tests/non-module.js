@@ -1,1 +1,1 @@
-window.NonModule = 'non-module';
+NonModule = 'non-module';

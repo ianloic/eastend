@@ -35,10 +35,11 @@ function runTest(name) {
     var promise = tests[name]();
     promise.then(function() {
         succeeded++;
+        console.log('SUCCESS', id, name);
         updateProgress();
     }).catch(function(error) {
         failed++;
-        console.log('FAIL', id, name);
+        console.log('FAIL', id, name, error);
         updateProgress();
     });
 }

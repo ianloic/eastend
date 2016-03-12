@@ -1,1 +1,1 @@
-window.NonModuleGlobal = 'non-module-global';
+NonModuleGlobal = 'non-module-global';

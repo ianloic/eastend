@@ -1,7 +1,8 @@
+
 test('Simple module require', function () {
-    return require('tests/a.js').then(function (a) {
-        if (a !== 'a') {
-            return Promise.reject('Expected "a", got: ' + a.toString());
+    return require('tests/simple.js').then(function (simple) {
+        if (simple !== 'simple') {
+            return Promise.reject('Expected "simple", got: ' + simple.toString());
         }
     });
 });
@@ -48,7 +49,7 @@ test('Invalid depedency', function() {
 
 test('Loading non-module', function() {
     return require('tests/non-module.js').then(function () {
-        if (!window.NonModule) {
+        if (!self.NonModule) {
             return Promise.reject('Expected NonModule global to be defined');
         }
     })
@@ -71,7 +72,7 @@ test('Circular dependencies', function() {
         return Promise.resolve();
     })
 });
-
+/*
 test('Triangular dependencies', function() {
     return require('tests/triangular-a.js').then(function (a) {
         return Promise.reject('Expected failure');
@@ -79,7 +80,7 @@ test('Triangular dependencies', function() {
         return Promise.resolve();
     })
 });
-
+*/
 test('Promise factory', function() {
     return require('tests/promise-factory.js').then(function (pf) {
         if (pf !== 'promise-factory') {
