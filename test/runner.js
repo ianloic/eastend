@@ -1,5 +1,7 @@
 // test configurations
 
+/* eslint-env es6 */
+
 var testRuns = new Map();
 
 var booleans = [false, true];
@@ -73,7 +75,6 @@ function logError(run, testCase, message) {
     }
     error.appendChild(document.createTextNode(message));
     errors.appendChild(error);
-
 }
 
 testRuns.forEach(function(testRun) {
