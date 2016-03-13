@@ -10,6 +10,7 @@
 
 (function (window) {
     var document = window.document;
+    var Promise = window.Promise;
 
     // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};

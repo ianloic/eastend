@@ -1,6 +1,8 @@
-/* global importScripts */
+/* eslint-env worker */
 
 (function (self) {
+    var Promise = self.Promise;
+
     var defined;
     var modules = {};
     var depGraph = {};
