@@ -8,6 +8,11 @@ There's an implementation of the API for running in pages (`eastend.js`) and one
 
 It's named after the east end of Alameda, where I live. Because there's another module loader with Promises called [Alameda](https://github.com/requirejs/alameda).
 
+## License
+&copy; 2016 [Ian McKellar](https://ian.mckellar.org/) <ian@mckellar.org>
+
+Distributed under the [MIT](COPYING) license.
+
 ## Usage
 ### Module naming
 Modules are refered to by URL. This is a departure from the AMD approach, but it seems easier to reason about. Modules URLs are relative to where they're being referenced, so in a page they're relative to that page's location but in module dependencies they're relative to the module's URL. 
@@ -82,3 +87,4 @@ In no particular order.
  * Support `module.exports` for easy use with CommonJS-style modules.
  * Support use in node.js?
  * Automated tests.
+ * Document testing system.

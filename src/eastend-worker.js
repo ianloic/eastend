@@ -1,3 +1,6 @@
+// Copyright 2016 Ian McKellar <ian@mckellar.org>
+// Distributed under the MIT license, see COPYING.
+
 /* eslint-env worker */
 
 (function (self) {

@@ -1,12 +1,5 @@
-// AMD loader using Promises etc.
-
-// Depends on:
-//  - document.head
-//  - Promises
-//  - URL
-
-// TODO:
-// - investigate dropping dependency on URL & document.head.
+// Copyright 2016 Ian McKellar <ian@mckellar.org>
+// Distributed under the MIT license, see COPYING.
 
 (function (window) {
     var document = window.document;
