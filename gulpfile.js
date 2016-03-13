@@ -1,10 +1,12 @@
+/* eslint-env node */
+/* eslint camelcase:0 */
+
 var gulp = require('gulp');
 var closureCompiler = require('google-closure-compiler').gulp();
 var eslint = require('gulp-eslint');
 
-
 gulp.task('default', function() {
-    gulp.src(['src/eastend*.js', 'test/*.js'])
+    gulp.src(['src/eastend*.js', 'test/*.js', 'gulpfile.js'])
         // eslint() attaches the lint output to the "eslint" property
         // of the file object so it can be used by other modules.
         .pipe(eslint())
@@ -16,7 +18,7 @@ gulp.task('default', function() {
         .pipe(eslint.failAfterError());
 
     gulp.src('src/eastend.js')
-        // Compile / minify to ES5
+        // Compile / minify
         .pipe(closureCompiler({
             compilation_level: 'ADVANCED',
             warning_level: 'VERBOSE',
@@ -26,7 +28,7 @@ gulp.task('default', function() {
         })).pipe(gulp.dest('dist/'));
 
     gulp.src('src/eastend-worker.js')
-        // Compile / minify to ES5
+        // Compile / minify
         .pipe(closureCompiler({
             compilation_level: 'ADVANCED',
             warning_level: 'VERBOSE',
