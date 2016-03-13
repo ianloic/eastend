@@ -4,11 +4,42 @@
     <meta charset="UTF-8">
     <title>Test Runner</title>
     <style>
+        /* mostly hide iframes */
         iframe {
-            width: 10px;
-            height: 10px;
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            border: 0;
+        }
+
+        /* progress display */
+        .success, .failure {
+            color: white;
+            display: inline-block;
+            width: 3em;
+            text-align: center;
+        }
+        .success {
+            background-color: green;
+        }
+        .failure {
+            background-color: red;
+        }
+
+        /* for error list */
+        .runName {
+            font-weight: bold;
+            margin-right: 1em;
+        }
+
+        .testCaseName {
+            font-style: italic;
+            margin-right: 1em;
         }
     </style>
+    <!-- Include Joshua Bell's polyfill so we can write saner code -->
+    <script src="https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js"></script>
+
 </head>
 <body>
 <table>
@@ -20,6 +51,7 @@
     </thead>
     <tbody id="tbody"></tbody>
 </table>
+<pre id="errors"></pre>
 <script src="runner.js"></script>
 </body>
 </html>

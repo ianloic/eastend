@@ -7,6 +7,7 @@ window.onerror = function(message, source, lineno, colno, error) {
     pre.setAttribute('style', 'background:red;color:white');
     root.appendChild(pre);
     pre.appendChild(document.createTextNode(message + '\n' + source + ':' + lineno + ':' + colno + '\n'+error));
+    // TODO: report error?
 };
 
 function importScript(url, callback) {
@@ -33,6 +34,7 @@ function load(urls, callback) {
     }
 }
 
-function sendMessage(message) {
-    window.parent.postMessage(message, document.origin);
+function sendMessage() {
+    var args = Array.prototype.slice.call(arguments);
+    window.parent.postMessage(args, location.origin);
 }

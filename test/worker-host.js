@@ -8,8 +8,9 @@ function load(urls, callback) {
     callback();
 }
 
-function sendMessage(message) {
-    postMessage(message);
+function sendMessage() {
+    var args = Array.prototype.slice.call(arguments);
+    self.postMessage(args);
 }
 
 importScripts('host-common.js');
