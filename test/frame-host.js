@@ -27,7 +27,7 @@ function load(urls, callback) {
         // All loaded.
         callback();
     } else {
-        var url = urls.pop();
+        var url = urls.shift();
         importScript(url, function() {
             load(urls, callback);
         });
