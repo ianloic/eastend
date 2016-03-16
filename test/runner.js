@@ -14,7 +14,9 @@ booleans.forEach(function(compiled) {
                 (compiled ? 'compiled' : 'source');
             var urls = [];
             if (polyfill) {
-                urls.push('https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js');
+                urls.push('https://cdn.rawgit.com/github/url-polyfill/master/url.js');
+                urls.push('https://cdn.rawgit.com/taylorhakes/promise-polyfill/master/Promise.js');
+//                urls.push('https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js');
             }
             urls.push('../' + (compiled?'dist':'src') +
                 '/eastend' + (worker?'-worker':'') +
