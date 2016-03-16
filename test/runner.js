@@ -16,7 +16,7 @@ booleans.forEach(function(compiled) {
             if (polyfill) {
                 urls.push('https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js');
             }
-            urls.push('../../' + (compiled?'dist':'src') +
+            urls.push('../' + (compiled?'dist':'src') +
                 '/eastend' + (worker?'-worker':'') +
                 (compiled?'.min':'') + '.js');
             urls.push('tests.js');
