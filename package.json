@@ -1,6 +1,6 @@
 {
   "name": "eastend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A module / script loader for modern browsers.",
   "main": "src/eastend.js",
   "scripts": {

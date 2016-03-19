@@ -13,5 +13,12 @@
   "moduleType": [
     "globals"
   ],
-  "homepage": ""
+  "homepage": "https://github.com/ianloic/eastend",
+  "ignore": [
+    "**/.*",
+    "test/",
+    "gulpfile.js".
+    "dist/",
+    "node_modules/"
+  ]
 }
