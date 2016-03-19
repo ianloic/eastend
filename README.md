@@ -17,7 +17,7 @@ Distributed under the [MIT](COPYING) license.
 
 ## Usage
 ### Module naming
-Modules are refered to by URL. This is a departure from the AMD approach, but it seems easier to reason about. Modules URLs are relative to where they're being referenced, so in a page they're relative to that page's location but in module dependencies they're relative to the module's URL. 
+Modules are referred to by URL. This is a departure from the AMD approach, but it seems easier to reason about. Modules URLs are relative to where they're being referenced, so in a page they're relative to that page's location but in module dependencies they're relative to the module's URL. 
 
 ### Module API
 Modules are Javascript files. Each file can only contain one module. Modules declare a list of dependencies and a function that returns the module's value. That value can be a promise.
