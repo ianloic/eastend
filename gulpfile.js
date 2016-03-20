@@ -20,6 +20,7 @@ gulp.task('default', function() {
     gulp.src('src/eastend.js')
         // Compile / minify
         .pipe(closureCompiler({
+            //formatting: 'PRETTY_PRINT',
             compilation_level: 'ADVANCED',
             warning_level: 'VERBOSE',
             language_in: 'ECMASCRIPT5',

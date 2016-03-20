@@ -19,7 +19,7 @@ function runTest(name) {
     promise.then(function() {
         sendMessage('testCaseSuccess', run, name);
     }).catch(function(error) {
-        sendMessage('testCaseFailure', run, name, error.toString());
+        sendMessage('testCaseFailure', run, name, error?error.toString():error);
     });
 }
 

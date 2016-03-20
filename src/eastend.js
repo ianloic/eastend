@@ -73,7 +73,27 @@
 
         function scriptLoaded() {
             if (defined) {
-                defineScript(url, defined[0], defined[1]);
+                var moduleDeps = depGraph[url] || {};
+                var deps = defined[0];
+                var factory = defined[1];
+
+                var dependencyPromises = deps.map(function(dep) {
+                    var depUrl = relative(dep, url);
+                    moduleDeps[depUrl] = 1;
+                    return requireUrl(depUrl);
+                });
+                depGraph[url] = moduleDeps;
+                if (findCycles(url)) {
+                    rejectScript(url);
+                    return;
+                }
+                Promise.all(dependencyPromises).then(function (loadedDeps) {
+                    modules[url] = factory.apply(window, loadedDeps);
+                    resolveScript(url);
+                }).catch(function (err) {
+                    console.error(err);
+                    rejectScript(url);
+                });
                 defined = null;
             } else {
                 if (global) {
@@ -88,8 +108,7 @@
         return new Promise(function (resolve, reject) {
             callbacks[url].push([resolve, reject]);
             var script = document.createElement('script');
-            var hasCallback = url.substr(-1) === '=';
-            if (hasCallback) {
+            if (url.substr(-1) === '=') {
                 // This module calls a callback.
                 var callbackName = 'cb' + nextId;
                 nextId++;
@@ -134,34 +153,6 @@
             }
         }
         return false;
-    }
-
-    /**
-     * Instantiate a module, given its url, dependencies and factory function.
-     * @param {string} url - URL of the module
-     * @param {Array} deps - dependency names of the module
-     * @param {Function} factory - function that returns the module
-     * @return {void}
-     */
-    function defineScript(url, deps, factory) {
-        var moduleDeps = depGraph[url] || {};
-
-        var dependencyPromises = deps.map(function(dep) {
-            var depUrl = relative(dep, url);
-            moduleDeps[depUrl] = 1;
-            return requireUrl(depUrl);
-        });
-        depGraph[url] = moduleDeps;
-        if (findCycles(url)) {
-            rejectScript(url);
-            return;
-        }
-        Promise.all(dependencyPromises).then(function (loadedDeps) {
-            modules[url] = factory.apply(window, loadedDeps);
-            resolveScript(url);
-        }).catch(function () {
-            rejectScript(url);
-        });
     }
 
     function require(moduleName, global) {
