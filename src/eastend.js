@@ -17,6 +17,9 @@
     // The last thing that was define()d.
     var defined;
 
+    // The id for the next callback.
+    var nextId=0;
+
     function relative(url, base) {
         return (new URL(url, base)).toString();
     }
@@ -68,23 +71,34 @@
 
         callbacks[url] = [];
 
+        function scriptLoaded() {
+            if (defined) {
+                defineScript(url, defined[0], defined[1]);
+                defined = null;
+            } else {
+                if (global) {
+                    modules[url] = window[global];
+                } else {
+                    modules[url] = true;
+                }
+                resolveScript(url);
+            }
+        }
+
         return new Promise(function (resolve, reject) {
             callbacks[url].push([resolve, reject]);
             var script = document.createElement('script');
-            script.src = url;
-            script.onload = function () {
-                if (defined) {
-                    defineScript(url, defined[0], defined[1]);
-                    defined = null;
-                } else {
-                    if (global) {
-                        modules[url] = window[global];
-                    } else {
-                        modules[url] = true;
-                    }
-                    resolveScript(url);
-                }
-            };
+            var hasCallback = url.substr(-1) === '=';
+            if (hasCallback) {
+                // This module calls a callback.
+                var callbackName = 'cb' + nextId;
+                nextId++;
+                window[callbackName] = scriptLoaded;
+                script.src = url + callbackName;
+            } else {
+                script.src = url;
+                script.onload = scriptLoaded;
+            }
             script.onerror = function () {
                 rejectScript(url);
             };
@@ -155,12 +169,10 @@
         var url = relative(moduleName, base);
         return requireUrl(url, global);
     }
-
     window['require'] = require;
 
     function define(deps, factory) {
         defined = [deps, factory];
     }
-
     window['define'] = define;
 }(window));
