@@ -71,11 +71,17 @@
 
         callbacks[url] = [];
 
-        function scriptLoaded() {
+        /** Script has finished loading.
+         *
+         * @param {Object=} callbackValue - the value delivered by a callback
+         * @return {void}
+         */
+        function scriptLoaded(callbackValue) {
             if (defined) {
                 var moduleDeps = depGraph[url] || {};
                 var deps = defined[0];
                 var factory = defined[1];
+                defined = null;
 
                 var dependencyPromises = deps.map(function(dep) {
                     var depUrl = relative(dep, url);
@@ -90,16 +96,14 @@
                 Promise.all(dependencyPromises).then(function (loadedDeps) {
                     modules[url] = factory.apply(window, loadedDeps);
                     resolveScript(url);
-                }).catch(function (err) {
-                    console.error(err);
+                }).catch(function () {
                     rejectScript(url);
                 });
-                defined = null;
             } else {
                 if (global) {
                     modules[url] = window[global];
                 } else {
-                    modules[url] = true;
+                    modules[url] = callbackValue || true;
                 }
                 resolveScript(url);
             }
@@ -116,7 +120,9 @@
                 script.src = url + callbackName;
             } else {
                 script.src = url;
-                script.onload = scriptLoaded;
+                script.onload = function(){
+                    scriptLoaded();
+                };
             }
             script.onerror = function () {
                 rejectScript(url);

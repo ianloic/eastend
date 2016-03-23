@@ -1,5 +1,6 @@
 /* global test, require */
 
+
 test('Simple module require', function () {
     return require('tests/simple.js').then(function (simple) {
         if (simple !== 'simple') {
@@ -97,6 +98,56 @@ test('Promise factory rejection', function () {
     return require('tests/promise-factory-reject.js').then(function () {
         return Promise.reject('Expected failure');
     }).catch(function () {
+        return Promise.resolve();
+    });
+});
+
+var TEST_SERVER_CB = 'https://eastend-test-server.appspot.com/callback';
+
+test('Load a JS file with a callback, immediate', function() {
+    return require(TEST_SERVER_CB + '?immediate&value=cb1&callback=').then(function(cb) {
+        if (!cb) {
+            return Promise.reject('Expected callback argument');
+        }
+        if (cb !== 'cb1') {
+            return Promise.reject('Got callback argument "' + cb + '", expected \'cb1"');
+        }
+        return Promise.resolve();
+    });
+});
+
+test('Load a JS file with a callback, delayed', function() {
+    return require(TEST_SERVER_CB + '?value=cb2&callback=').then(function(cb) {
+        if (!cb) {
+            return Promise.reject('Expected callback argument');
+        }
+        if (cb !== 'cb2') {
+            return Promise.reject('Got callback argument "' + cb + '", expected \'cb2"');
+        }
+        return Promise.resolve();
+    });
+});
+
+test('Load a JS file with a callback and a global', function() {
+    return require(TEST_SERVER_CB + '?immediate&value=cb3&global=global1&callback=', 'global1').then(function(global1) {
+        if (!global1) {
+            return Promise.reject('Expected promise value');
+        }
+        if (global1 !== 'cb3') {
+            return Promise.reject('Got callback argument "' + global1 + '", expected \'cb3"');
+        }
+        return Promise.resolve();
+    });
+});
+
+test('Load a JS file with a callback and a global, delayed', function() {
+    return require(TEST_SERVER_CB + '?value=cb4&global=global2&callback=', 'global2').then(function(global2) {
+        if (!global2) {
+            return Promise.reject('Expected promise value');
+        }
+        if (global2 !== 'cb4') {
+            return Promise.reject('Got callback argument "' + global2 + '", expected \'cb4"');
+        }
         return Promise.resolve();
     });
 });
