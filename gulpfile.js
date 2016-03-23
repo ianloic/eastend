@@ -4,6 +4,7 @@
 var gulp = require('gulp');
 var closureCompiler = require('google-closure-compiler').gulp();
 var eslint = require('gulp-eslint');
+var size = require('gulp-size');
 
 gulp.task('default', function() {
     gulp.src(['src/eastend*.js', 'test/*.js', 'gulpfile.js'])
@@ -26,5 +27,11 @@ gulp.task('default', function() {
             language_in: 'ECMASCRIPT5',
             language_out: 'ECMASCRIPT5',
             js_output_file: 'eastend.min.js'
-        })).pipe(gulp.dest('dist/'));
+        }))
+        .pipe(size({
+            pretty: false,
+            showFiles: true,
+            showTotal: false
+        }))
+        .pipe(gulp.dest('dist/'));
 });
