@@ -165,9 +165,11 @@
             return false;
         }
         for (var dep in deps) {
+            /*
             if (!deps.hasOwnProperty(dep)) {
                 continue;
             }
+            */
             if (findCycles(dep, v)) {
                 return true;
             }
