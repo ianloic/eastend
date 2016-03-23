@@ -10,7 +10,7 @@
     var depGraph = {};
 
     // Outstanding promise callbacks to be delivered for a particular module.
-    var callbacks = {};
+    var promiseCallbacks = {};
 
     // Modules, by URL.
     var modules = {};
@@ -25,23 +25,6 @@
         return (new URL(url, base)).toString();
     }
 
-    /**
-     * Complete the loading of a script. Call the appropriate callbacks.
-     *
-     * @param {string} url - the URL of the module.
-     * @param {number} callback - 0 for the resolve callbacks, 1 for the reject callbacks.
-     * @param {Object=} argument - the callback argument.
-     * @returns {void}
-     */
-    function complete(url, callback, argument) {
-        if (!callbacks[url]) {
-            return;
-        }
-        callbacks[url].forEach(function(cbs) {
-            cbs[callback](argument);
-        });
-        delete callbacks[url];
-    }
 
     /**
      * Load a module or script.
@@ -55,21 +38,39 @@
             // Module already loaded - resolve immediately.
             return Promise.resolve(modules[url]);
         }
-        if (callbacks[url]) {
+
+        if (promiseCallbacks[url]) {
             // Module is already being loaded, return a promise that will complete when the in-progress load completes.
             return new Promise(function (resolve, reject) {
-                callbacks[url].push([resolve, reject]);
+                promiseCallbacks[url].push([resolve, reject]);
             });
         }
 
-        callbacks[url] = [];
+        promiseCallbacks[url] = [];
+
+        /**
+         * Complete the loading of a script. Call the appropriate callbacks.
+         *
+         * @param {number} callback - 0 for the resolve callbacks, 1 for the reject callbacks.
+         * @param {Object=} argument - the callback argument.
+         * @returns {void}
+         */
+        function complete(callback, argument) {
+            if (!promiseCallbacks[url]) {
+                return;
+            }
+            promiseCallbacks[url].forEach(function(cbs) {
+                cbs[callback](argument);
+            });
+            delete promiseCallbacks[url];
+        }
 
         function resolveScript() {
-            return complete(url, 0, modules[url]);
+            return complete(0, modules[url]);
         }
 
         function rejectScript() {
-            return complete(url, 1);
+            return complete(1);
         }
 
         /** Script has finished loading.
@@ -109,7 +110,7 @@
         }
 
         return new Promise(function (resolve, reject) {
-            callbacks[url].push([resolve, reject]);
+            promiseCallbacks[url].push([resolve, reject]);
             var useCallback = url.substr(-1) === '=';
             var src = url;
             var onload;
