@@ -1,11 +1,10 @@
 // Copyright 2016 Ian McKellar <ian@mckellar.org>
 // Distributed under the MIT license, see COPYING.
 
-/* globals importScripts */
-
 (function (window) {
     var document = window.document;
     var Promise = window.Promise;
+    var importScripts = window.importScripts;
 
     // Dependency graph - maps module urls to arrays of urls of module dependencies.
     var depGraph = {};
@@ -98,9 +97,7 @@
                 Promise.all(dependencyPromises).then(function (loadedDeps) {
                     modules[url] = factory.apply(window, loadedDeps);
                     resolveScript();
-                }).catch(function () {
-                    rejectScript();
-                });
+                }).catch(rejectScript);
             } else {
                 if (global) {
                     modules[url] = window[global];
@@ -131,27 +128,19 @@
                 var script = document.createElement('script');
                 script.src = src;
                 script.onload = onload;
-                script.onerror = function () {
-                    rejectScript();
-                };
+                script.onerror = rejectScript;
                 document.head.appendChild(script);
             } else {
-                if (useCallback) {
+                setTimeout(function() {
                     try {
                         importScripts(src);
+                        if (onload) {
+                            onload();
+                        }
                     } catch (error) {
                         rejectScript();
                     }
-                } else {
-                    setTimeout(function() {
-                        try {
-                            importScripts(src);
-                            scriptLoaded();
-                        } catch (error) {
-                            rejectScript();
-                        }
-                    }, 100);
-                }
+                }, 1);
             }
         });
     }

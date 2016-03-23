@@ -6,8 +6,8 @@ var testRuns = new Map();
 
 var booleans = [false, true];
 
-[false].forEach(function(compiled) {
-    [false].forEach(function(polyfill) {
+booleans.forEach(function(compiled) {
+    booleans.forEach(function(polyfill) {
         booleans.forEach(function(worker) {
             var id = (worker ? 'worker' : 'frame') + '-' +
                 (polyfill ? 'polyfill' : 'native') + '-' +
