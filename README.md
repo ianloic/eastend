@@ -4,9 +4,9 @@ A small, simple Promise-first Javascript module loader for modern browsers.
 It's inspired by the AMD loader spec but it uses Promises rather than callbacks.
 It can also load non-AMD Javascript libraries.
 
-It's really quite small - under 1k before compression.
+It's really quite small - just over 1k before compression.
 
-There's an implementation of the API for running in pages (`eastend.js`) and one for use in Workers (`eastend-worker.js`).
+A single implementation (`eastend.js`) works in both Window and Worker contexts.
 
 It's named after the east end of Alameda, where I live. Because there's another module loader with Promises called [Alameda](https://github.com/requirejs/alameda).
 

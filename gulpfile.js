@@ -27,14 +27,4 @@ gulp.task('default', function() {
             language_out: 'ECMASCRIPT5',
             js_output_file: 'eastend.min.js'
         })).pipe(gulp.dest('dist/'));
-
-    gulp.src('src/eastend-worker.js')
-        // Compile / minify
-        .pipe(closureCompiler({
-            compilation_level: 'ADVANCED',
-            warning_level: 'VERBOSE',
-            language_in: 'ECMASCRIPT5',
-            language_out: 'ECMASCRIPT5',
-            js_output_file: 'eastend-worker.min.js'
-        })).pipe(gulp.dest('dist/'));
 });

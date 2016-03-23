@@ -15,7 +15,5 @@
  
 ## Cleanup
  * Better docs. Describe in specific detail how the API relates to the AMD & CommonJS APIs.
- * Tidy up `eastend-worker.js` - it has had less love than the browser version.
  * Choose polyfills to endorse.
  * More function argument comments.
- * Unify worker & page versions?

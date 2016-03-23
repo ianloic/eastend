@@ -19,7 +19,7 @@ var booleans = [false, true];
 //                urls.push('https://cdn.rawgit.com/inexorabletash/polyfill/v0.1.16/polyfill.min.js');
             }
             urls.push('../' + (compiled?'dist':'src') +
-                '/eastend' + (worker?'-worker':'') +
+                '/eastend' +
                 (compiled?'.min':'') + '.js');
             urls.push('tests.js');
             testRuns.set(id, {

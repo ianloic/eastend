@@ -1,6 +1,8 @@
 // Copyright 2016 Ian McKellar <ian@mckellar.org>
 // Distributed under the MIT license, see COPYING.
 
+/* globals importScripts */
+
 (function (window) {
     var document = window.document;
     var Promise = window.Promise;
@@ -42,14 +44,6 @@
         delete callbacks[url];
     }
 
-    function resolveScript(url) {
-        return complete(url, 0, modules[url]);
-    }
-
-    function rejectScript(url) {
-        return complete(url, 1);
-    }
-
     /**
      * Load a module or script.
      *
@@ -71,6 +65,14 @@
 
         callbacks[url] = [];
 
+        function resolveScript() {
+            return complete(url, 0, modules[url]);
+        }
+
+        function rejectScript() {
+            return complete(url, 1);
+        }
+
         /** Script has finished loading.
          *
          * @param {Object=} callbackValue - the value delivered by a callback
@@ -90,14 +92,14 @@
                 });
                 depGraph[url] = moduleDeps;
                 if (findCycles(url)) {
-                    rejectScript(url);
+                    rejectScript();
                     return;
                 }
                 Promise.all(dependencyPromises).then(function (loadedDeps) {
                     modules[url] = factory.apply(window, loadedDeps);
-                    resolveScript(url);
+                    resolveScript();
                 }).catch(function () {
-                    rejectScript(url);
+                    rejectScript();
                 });
             } else {
                 if (global) {
@@ -105,29 +107,52 @@
                 } else {
                     modules[url] = callbackValue || true;
                 }
-                resolveScript(url);
+                resolveScript();
             }
         }
 
         return new Promise(function (resolve, reject) {
             callbacks[url].push([resolve, reject]);
-            var script = document.createElement('script');
-            if (url.substr(-1) === '=') {
+            var useCallback = url.substr(-1) === '=';
+            var src = url;
+            var onload;
+            if (useCallback) {
                 // This module calls a callback.
                 var callbackName = 'cb' + nextId;
                 nextId++;
                 window[callbackName] = scriptLoaded;
-                script.src = url + callbackName;
+                src = url + callbackName;
             } else {
-                script.src = url;
-                script.onload = function(){
+                onload = function(){
                     scriptLoaded();
                 };
             }
-            script.onerror = function () {
-                rejectScript(url);
-            };
-            document.head.appendChild(script);
+            if (document) {
+                var script = document.createElement('script');
+                script.src = src;
+                script.onload = onload;
+                script.onerror = function () {
+                    rejectScript();
+                };
+                document.head.appendChild(script);
+            } else {
+                if (useCallback) {
+                    try {
+                        importScripts(src);
+                    } catch (error) {
+                        rejectScript();
+                    }
+                } else {
+                    setTimeout(function() {
+                        try {
+                            importScripts(src);
+                            scriptLoaded();
+                        } catch (error) {
+                            rejectScript();
+                        }
+                    }, 100);
+                }
+            }
         });
     }
 
@@ -172,4 +197,4 @@
         defined = [deps, factory];
     }
     window['define'] = define;
-}(window));
+}(self || window));
