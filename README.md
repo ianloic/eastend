@@ -16,6 +16,14 @@ It's named after the east end of Alameda, where I live. Because there's another 
 
 Distributed under the [MIT](COPYING) license.
 
+## Installation
+
+East End is in [npm](https://www.npmjs.com/package/eastend) and bower, but it's pretty easy just to install from
+[github](https://github.com/ianloic/eastend). If you want you could use it from the RawGit CDN, just make sure you use 
+a release tag to avoid surprises:
+
+    <script src="https://cdn.rawgit.com/ianloic/eastend/VERSION/dist/eastend.min.js">
+
 ## Usage
 ### Module naming
 Modules are referred to by URL. This is a departure from the AMD approach, but it seems easier to reason about. 
