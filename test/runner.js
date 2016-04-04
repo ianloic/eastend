@@ -6,9 +6,27 @@ var testRuns = new Map();
 
 var booleans = [false, true];
 
-booleans.forEach(function(compiled) {
-    booleans.forEach(function(polyfill) {
-        booleans.forEach(function(worker) {
+var versions = [];
+var polyfills = [];
+var environments = [];
+
+var configs = window.location.hash.split('#');
+for (var i=1; i<configs.length; i++) {
+    if (configs[i] == 'source') versions.push(false);
+    else if (configs[i] == 'compiled') versions.push(true);
+    else if (configs[i] == 'native') polyfills.push(false);
+    else if (configs[i] == 'polyfill') polyfills.push(true);
+    else if (configs[i] == 'frame') environments.push(false);
+    else if (configs[i] == 'worker') environments.push(true);
+}
+
+versions = versions.length?versions:booleans;
+polyfills = polyfills.length?polyfills:booleans;
+environments = environments.length?environments:booleans;
+
+versions.forEach(function(compiled) {
+    polyfills.forEach(function(polyfill) {
+        environments.forEach(function(worker) {
             var id = (worker ? 'worker' : 'frame') + '-' +
                 (polyfill ? 'polyfill' : 'native') + '-' +
                 (compiled ? 'compiled' : 'source');
