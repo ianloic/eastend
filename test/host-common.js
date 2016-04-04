@@ -31,9 +31,11 @@ self.onmessage = function onmessage(event) {
         return;
     }
 
-    run = event.data[0];
+    var data = JSON.parse(event.data);
 
-    load(event.data[1], function() {
+    run = data[0];
+
+    load(data[1], function() {
         sendMessage('startRun', run, numTests);
         for (var name in tests) {
             if (!tests.hasOwnProperty(name)) {

@@ -10,7 +10,7 @@ function load(urls, callback) {
 
 function sendMessage() {
     var args = Array.prototype.slice.call(arguments);
-    self.postMessage(args);
+    self.postMessage(JSON.stringify(args));
 }
 
 importScripts('host-common.js');

@@ -36,5 +36,5 @@ function load(urls, callback) {
 
 function sendMessage() {
     var args = Array.prototype.slice.call(arguments);
-    window.parent.postMessage(args, location.origin);
+    window.parent.postMessage(JSON.stringify(args), location.origin);
 }

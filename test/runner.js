@@ -141,7 +141,7 @@ function frameTest(id, urls) {
     var iframe = document.createElement('iframe');
     iframe.src='frame-host.html';
     iframe.onload = function() {
-        iframe.contentWindow.postMessage([id, urls], location.origin);
+        iframe.contentWindow.postMessage(JSON.stringify([id, urls]), location.origin);
     };
     iframe.onerror = function(event) {
         logError(id, null, event.toString());
@@ -155,18 +155,18 @@ window.onmessage = function(event) {
         console.error('postMessage origin mismatch', event.origin, location.origin);
         return;
     }
-    handleMessage(event.data);
+    handleMessage(JSON.parse(event.data));
 };
 
 function workerTest(id, urls) {
     var worker = new Worker('worker-host.js');
     worker.onmessage = function(event) {
-        handleMessage(event.data);
+        handleMessage(JSON.parse(event.data));
     };
     worker.onerror = function(event) {
         logError(id, null, event.toString());
         console.error('worker error', event);
     };
-    worker.postMessage([id, urls]);
+    worker.postMessage(JSON.stringify([id, urls]));
 }
 
