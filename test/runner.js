@@ -2,6 +2,9 @@
 
 /* eslint-env es6 */
 
+// For compatibility with older IE.
+var origin = location.origin || location.protocol + '//' + location.hostname;
+
 var testRuns = new Map();
 
 var booleans = [false, true];
@@ -141,7 +144,9 @@ function frameTest(id, urls) {
     var iframe = document.createElement('iframe');
     iframe.src='frame-host.html';
     iframe.onload = function() {
-        iframe.contentWindow.postMessage(JSON.stringify([id, urls]), location.origin);
+        var message = JSON.stringify([id, urls]);
+        console.log(origin);
+        iframe.contentWindow.postMessage(message, origin);
     };
     iframe.onerror = function(event) {
         logError(id, null, event.toString());
@@ -151,8 +156,8 @@ function frameTest(id, urls) {
     return iframe;
 }
 window.onmessage = function(event) {
-    if (event.origin !== location.origin) {
-        console.error('postMessage origin mismatch', event.origin, location.origin);
+    if (event.origin !== origin) {
+        console.error('postMessage origin mismatch', event.origin, origin);
         return;
     }
     handleMessage(JSON.parse(event.data));

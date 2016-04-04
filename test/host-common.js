@@ -3,6 +3,9 @@
 /* globals load, sendMessage */
 /* exported test */
 
+// For compatibility with older IE.
+var origin = location.origin || location.protocol + '//' + location.hostname;
+
 var run;
 
 var tests = {};
@@ -26,8 +29,8 @@ function runTest(name) {
 
 self.onmessage = function onmessage(event) {
     // For non-worker hosts, do a same-origin check.
-    if (event.origin && event.origin !== location.origin) {
-        console.error('postMessage origin mismatch', event.origin, location.origin);
+    if (event.origin && event.origin !== origin) {
+        console.error('postMessage origin mismatch', event.origin, origin);
         return;
     }
 
