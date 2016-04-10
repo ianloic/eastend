@@ -104,9 +104,13 @@ Both page and worker Javascript contexts are supported.
  * recent Chrome
  * recent Firefox
  * recent Safari
+ * recent MS Edge
  
 ### With polyfills
- * IE 9-Edge
+ * IE 10-11
+ 
+### Some support
+ * IE 9 seems to mostly work
 
 ## Tests
 There are some tests in the tests/ directory. Load tests/runner.html in a browser.

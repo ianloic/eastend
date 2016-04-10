@@ -4,6 +4,13 @@
 
 // For compatibility with older IE.
 var origin = location.origin || location.protocol + '//' + location.hostname;
+function setText(element, value) {
+    if (element.textContent === undefined) {
+        element.innerText = value;
+    } else {
+        element.textContent = value;
+    }
+}
 
 var testRuns = new Map();
 
@@ -27,6 +34,20 @@ versions = versions.length?versions:booleans;
 polyfills = polyfills.length?polyfills:booleans;
 environments = environments.length?environments:booleans;
 
+function Run(id, urls, worker) {
+    this.id = id;
+    this.urls = urls;
+    this.worker = worker;
+    this.started = false;
+    this.element = null;
+    this.elements = {};
+    this.numTests = 0;
+    this.success = [];
+    this.failure = [];
+    this.failures = {};
+
+}
+
 versions.forEach(function(compiled) {
     polyfills.forEach(function(polyfill) {
         environments.forEach(function(worker) {
@@ -43,24 +64,13 @@ versions.forEach(function(compiled) {
                 '/eastend' +
                 (compiled?'.min':'') + '.js');
             urls.push('tests.js');
-            testRuns.set(id, {
-                id: id,
-                urls: urls,
-                worker: worker,
-                started: false,
-                element: null,
-                elements: {},
-                numTests: 0,
-                success: [],
-                failure: [],
-                failures: {}
-            });
+            testRuns.set(id, new Run(id, urls, worker));
         });
     });
 });
 
 var report = {
-    // test run {id} starts
+    // test run starts
     startRun: function(run, numTests) {
         run.started = true;
         run.numTests = numTests;
@@ -68,13 +78,13 @@ var report = {
 
     testCaseSuccess: function(run, testCase) {
         run.success.push(testCase);
-        run.elements.success.textContent = run.success.length;
+        setText(run.elements.success, run.success.length);
     },
 
     testCaseFailure: function(run, testCase, message) {
         console.error('testCaseFailure', run, testCase, message);
         run.failure.push(testCase);
-        run.elements.failure.textContent = run.failure.length;
+        setText(run.elements.failure, run.failure.length);
         logError(run, testCase, message);
     }
 };
@@ -87,13 +97,13 @@ function logError(run, testCase, message) {
     if (run) {
         var runName = document.createElement('span');
         runName.className = 'runName';
-        runName.textContent = run.id;
+        setText(runName, run.id);
         error.appendChild(runName);
     }
     if (testCase) {
         var testCaseName = document.createElement('span');
         testCaseName.className = 'testCaseName';
-        testCaseName.textContent = testCase;
+        setText(testCaseName, testCase);
         error.appendChild(testCaseName);
     }
     error.appendChild(document.createTextNode(message));
@@ -111,7 +121,7 @@ function runTests(testRun) {
     testRun.element.id = testRun.id;
 
     testRun.elements.name = document.createElement('td');
-    testRun.elements.name.textContent = testRun.id;
+    setText(testRun.elements.name, testRun.id);
     testRun.elements.name.className = 'name';
     testRun.elements.tr.appendChild(testRun.elements.name);
 
@@ -121,17 +131,21 @@ function runTests(testRun) {
 
     testRun.elements.success = document.createElement('div');
     testRun.elements.success.className = 'success';
-    testRun.elements.success.textContent = '0';
+    setText(testRun.elements.success, '0');
     testRun.elements.progress.appendChild(testRun.elements.success);
 
     testRun.elements.failure = document.createElement('div');
     testRun.elements.failure.className = 'failure';
-    testRun.elements.failure.textContent = '0';
+    setText(testRun.elements.failure, '0');
     testRun.elements.progress.appendChild(testRun.elements.failure);
 
     tbody.appendChild(testRun.elements.tr);
 
-    (testRun.worker?workerTest:frameTest)(testRun.id, testRun.urls);
+    try {
+        (testRun.worker?workerTest:frameTest)(testRun.id, testRun.urls);
+    } catch (e) {
+        logError(testRun.id, null, e);
+    }
 }
 
 function handleMessage(data) {
@@ -142,8 +156,13 @@ function handleMessage(data) {
 
 function frameTest(id, urls) {
     var iframe = document.createElement('iframe');
+    var done = false;
     iframe.src='frame-host.html';
-    iframe.onload = function() {
+    iframe.onload = iframe.onreadystatechange = function() {
+        if (done || this.readyState && this.readyState !== 'complete' && this.readyState !== 'loaded') {
+            return;
+        }
+        done = true;
         var message = JSON.stringify([id, urls]);
         console.log(origin);
         iframe.contentWindow.postMessage(message, origin);
